@@ -1,0 +1,155 @@
+---
+title: "Harrington Stat Comp HW 3"
+format: 
+  html: 
+    output-file: "hw3.html"
+---
+
+```{r}
+#| echo: false
+#| warning: false
+
+library(dplyr)
+library(tidyr)
+library(reactable)
+
+
+```
+
+# 1) The following is a table displaying information on various Universities around the world.
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
+df= read.csv('http://manctsui.github.io/datasets/timesData.csv')
+reactable(df, defaultPageSize = 4, searchable = T)
+```
+
+# 2) Dr. Tsui's alma mater, UCLA, had the following world rankings.
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
+df |>
+  filter(grepl("Los Angeles", university_name) ==T) |>
+  select(university_name ,world_rank, year)
+
+```
+
+# 3-4) UCLA vs. UC Berkeley Rankings
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
+#| layout-ncol: 2
+#| 
+x= df |> 
+  filter(grepl("Los Angeles", university_name) ==T) |>
+  select(year)
+y= df |> 
+  filter(grepl("Los Angeles", university_name) ==T) |>
+  select(world_rank)
+x_plot= x[,1]
+y_mid= y[,1]
+y_plot=as.numeric(y_mid)
+plot(x_plot,y_plot,
+     main = "Ranking of UCLA",
+     xlab= "Year",
+     ylab = "Rank",
+     type= "l",
+     xlim = c(2011,2016),
+     ylim = c(5,16))
+
+x= df |> 
+  filter(grepl("Berkeley", university_name) ==T) |>
+  select(year)
+y= df |> 
+  filter(grepl("Berkeley", university_name) ==T) |>
+  select(world_rank)
+x_plot= x[,1]
+y_mid= y[,1]
+y_plot=as.numeric(y_mid)
+plot(x_plot,y_plot,
+     main = "Ranking of UC Berkeley",
+     xlab= "Year",
+     ylab = "Rank",
+     type= "l",
+     xlim = c(2011,2016),
+     ylim = c(5,16))
+```
+
+# 5) The following are the US Universities ranked in the top 50 globally, grouped by year
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
+#| layout-ncol: 6
+#| 
+q5 = df |> 
+  filter(country == "United States of America", as.numeric(world_rank)<= 50, year == "2011") |>
+  select(university_name, world_rank, year)
+
+reactable(q5, defaultPageSize = 50, searchable = T)
+
+q5 = df |> 
+  filter(country == "United States of America", as.numeric(world_rank)<= 50, year == "2012") |>
+  select(university_name, world_rank, year)
+
+reactable(q5, defaultPageSize = 50, searchable = T)
+
+q5 = df |> 
+  filter(country == "United States of America", as.numeric(world_rank)<= 50, year == "2013") |>
+  select(university_name, world_rank, year)
+
+reactable(q5, defaultPageSize = 50, searchable = T)
+
+q5 = df |> 
+  filter(country == "United States of America", as.numeric(world_rank)<= 50, year == "2014") |>
+  select(university_name, world_rank, year)
+
+reactable(q5, defaultPageSize = 50, searchable = T)
+
+q5 = df |> 
+  filter(country == "United States of America", as.numeric(world_rank)<= 50, year == "2015") |>
+  select(university_name, world_rank, year)
+
+reactable(q5, defaultPageSize = 50, searchable = T)
+
+q5 = df |> 
+  filter(country == "United States of America", as.numeric(world_rank)<= 50, year == "2016") |>
+  select(university_name, world_rank, year)
+
+reactable(q5, defaultPageSize = 50, searchable = T)
+```
+We can see that many of the Universities ranked above 30th in 2011 do not break the top 50 in 2016.
+
+
+
+
+# The following are additional tables to review the top 50 US Universities in other ways
+
+```{r}
+#| code-fold: true
+#| warning: false
+q5 = df |> 
+    group_by(year, world_rank) |>
+  filter(country == "United States of America", as.numeric(world_rank)<= 50) |>
+  select(university_name, world_rank, year)
+
+reactable(q5, defaultPageSize = 10, searchable = T)
+```
+
+```{r}
+#| code-fold: true
+#| warning: false
+q6 = df |> 
+    group_by(year, world_rank) |>
+  filter(as.numeric(world_rank)<= 50) |>
+  select(university_name, country, world_rank, year)
+
+reactable(q6, defaultPageSize = 50, searchable = T)
+```

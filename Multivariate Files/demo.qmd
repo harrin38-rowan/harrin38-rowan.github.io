@@ -1,0 +1,45 @@
+---
+title: "Demographics Across Countries"
+format: 
+  html: 
+    output-file: "index.html"
+---
+
+```{r}
+#| echo: false
+#| warning: false
+
+library(dplyr)
+library(tidyr)
+library(reactable)
+
+
+```
+
+```{r}
+df = read.csv('http://manctsui.github.io/datasets/countries.csv')
+reactable(df, defaultPageSize = 4, searchable = T)
+
+```
+
+#Net migration
+
+Net Migration is given by the following formula: 
+$$
+\text{Migration into country} - \text{Migration out of country}
+$$
+
+:::{fig-countries-migration}
+```{r}
+#|code-fold: true
+#|llayout-ncol: 2
+
+least = df |>
+  arrange(Net.migration) |>
+  head(3) |>
+  select("Most Negative Net Migration" = Country)
+
+reactable(least)
+```
+Countries with extreme net migration
+:::
