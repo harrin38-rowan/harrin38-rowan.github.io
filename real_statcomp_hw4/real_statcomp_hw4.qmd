@@ -1,0 +1,94 @@
+---
+title: "Harrington Stat Comp HW 4"
+format: 
+  html: 
+    output-file: "hw4.html"
+---
+
+```{r}
+#| echo: false
+#| warning: false
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reactable)
+library(plotly)
+library(crosstalk)
+```
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
+df= read.csv('http://manctsui.github.io/datasets/timesData.csv')
+# reactable(df, defaultPageSize = 4, searchable = T)
+```
+
+# Problem 1
+```{r}
+#| code-fold: true
+#| warning: false
+
+df2 = df |> 
+  group_by(country) |>
+  summarize(length(country)) |>
+  arrange(`length(country)`) |>
+  tail(3)
+
+reactable(df2, defaultPageSize = 4, searchable = T)
+df2$V2 = df2$`length(country)`
+# us_appearances = df |>
+#   filter(country == "United States of America")|>
+#   nrow()
+# 
+#   df |>
+#   filter(country == "United Kingdom")|>
+#   nrow()
+# plot = ggplot(df2, aes(country, `length(country)` )) + geom_bar()
+# plot
+plot_ly(df2, x = ~country, y=~V2, type = 'bar' )
+```
+
+# Problem 2
+```{r}
+#| code-fold: true
+#| warning: false
+
+df3 =
+  df |> 
+  filter(year == "2011", as.numeric(world_rank) <= 50) |>
+    select(world_rank, university_name)
+
+sd <- SharedData$new(df3, key = ~world_rank)
+
+filter_slider("name", "Rank", sd, ~as.numeric(world_rank))
+
+  reactable(sd, defaultPageSize = 10, searchable = T)
+```
+
+Rank would is a good key, as because we are only look at 2011, each ranking corresponds to only one school.
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+
+```
+
+# Problem 3
+```{r}
+#| code-fold: true
+#| warning: false
+
+df4 = df |>
+  filter(year == "2016") |>
+  select(num_students, student_staff_ratio, teaching)
+
+sd <- SharedData$new(df4, key = ~student_staff_ratio)
+
+plot_ly(sd, x = ~num_students, y=~student_staff_ratio, type = 'scatter' )
+
+plot_ly(sd, x = ~student_staff_ratio, y=~teaching, type = 'scatter' )
+
+```
