@@ -1,0 +1,145 @@
+---
+title: "harrington_statcomp_hw5"
+format: 
+  html: 
+    output-file: "harrington_statcomp_hw5.html"
+---
+
+```{r}
+#| echo: false
+#| warning: false
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reactable)
+library(plotly)
+library(crosstalk)
+```
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+df <- data.frame(
+x = c(5, 1, 4, NA, NA, NA, 2, 1),
+y = c(5, NA, 3, 2, 5, NA, 2, 1),
+z = c(1, 4, 2, 5, 2, NA, 5, 4),
+t = c(4, 2, NA, 1, 5, 2, 3, 3)
+)
+
+cor(df$y, df$x, use = "pairwise.complete.obs")
+cor(df$y, df$z, use = "pairwise.complete.obs")
+cor(df$y, df$t, use = "pairwise.complete.obs")
+
+meanu1= mean(df[,1], na.rm= T)
+meanu2 = mean(df[,2], na.rm= T)
+meanu3 = mean(df[,3], na.rm = T)
+meanu4= mean(df[,4], na.rm= T)
+
+u14 = meanu2 - meanu4 + df[6,4]
+u14
+
+```
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+df2 <- rbind(
+x = c(5, 1, 4, NA, NA, NA, 2, 1),
+y = c(5, NA, 3, 2, 5, 2.142857, 2, 1),
+z = c(1, 4, 2, 5, 2, NA, 5, 4),
+t = c(4, 2, NA, 1, 5, 2, 3, 3)
+)
+df2 = as.data.frame(df2)
+
+movie_means = c(0,0,0,0,0,0,0,0)
+for (i in 1:8) {
+  movie_means[i] = mean(df2[,i], na.rm = T)
+}
+movie_means
+```
+The above is a vector containing the means of the movie reviews.
+```{r}
+#| code-fold: true
+#| warning: false
+movie_sds = c(0,0,0,0,0,0,0,0)
+for (i in 1:8) {
+  movie_sds[i] = sd(df2[,i], na.rm = T)
+}
+movie_sds
+```
+The above is a vector containing the standard deviations of the movie reviews.
+```{r}
+#| code-fold: true
+#| warning: false
+for (i in 1:8) {
+df2[,i] = (df2[,i]- movie_means[i])/movie_sds[i]
+}
+df2
+```
+The standardized reviews of the movies.
+```{r}
+#| code-fold: true
+#| warning: false
+
+cor(df2,use = "pairwise.complete.obs", method = 'pearson')
+
+```
+Note that in the above matrix, two different movies with a correlation of 1 occurs because they share only 2 reviewers, and thus are guaranteed to have a linear relation. These entries should not be considered. Thus, the most similar movies are 1 and 5, 7 and 8, and 2 and 8.
+
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+data= read.csv("http://manctsui.github.io/datasets/countries.csv")
+
+data2 <- data |>
+ group_by(Region) |>
+ mutate(
+ Agriculture = ifelse(is.na(Agriculture),
+ mean(Agriculture, na.rm = TRUE), Agriculture)
+ ) |>
+    mutate(
+ Industry = ifelse(is.na(Industry),
+ mean(Industry, na.rm = TRUE), Industry)) |>
+ ungroup()
+
+data2 = data2 |> 
+  select(Country, Region, Industry, Agriculture)
+
+reactable(data2, defaultPageSize = 6, searchable = T)
+
+sum(is.na(data$Agriculture))
+sum(is.na(data$Industry))
+```
+# The original dataset had 15 missing values for Agriculture, and 16 missing values for Industry
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+
+df3 <- data.frame(
+temp = c(79, 74, 73, 76, 82, 72, 71, 79, 83, 70, 73, 75, 77),
+chirps = c(44, 40, 38, 43, 48, 37, 34, 45, 51, 32, 35, 42, 43)
+)
+lm(temp ~ chirps, data = df3)
+
+
+```
+
+```{r}
+rho = cor(df3$temp, df3$chirps)
+mu1 = mean(df3$temp)
+sd1 = sd(df3$temp) 
+mu2 = mean(df3$chirps)  
+sd2 = sd(df3$chirps)
+
+beta1 = rho*(sd1/sd2)
+
+alpha = mu1 - beta1*mu2
+```
+By multiplying the correlation of temp and chirps by the standard deviation of temp, and then dividing by the standard deviation for chirps, we get beta, the coefficient for the line of best fit. Then, by multiplying this beta with the mean of chirps and subtracting that from the mean of temp, we get alpha, the y-intercept for the line of best fit.
